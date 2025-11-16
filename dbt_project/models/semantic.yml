@@ -1,0 +1,42 @@
+semantic_models:
+  - name: graduates # A semantic model with the name Transactions
+    model: ref('fct_regional_education') # References the dbt model named `fact_transactions`
+    description: "Contains info about graduates."
+    defaults:
+      agg_time_dimension: dbt_updated_at
+
+    entities: # Entities included in the table are defined here. MetricFlow will use these columns as join keys.
+     #  - name: university
+      #   type: primary
+      #   expr: university_name
+      - name: area
+        type: foreign
+        expr: area_code
+
+  #dimensions: # dimensions are qualitative values such as names, dates, or geographical data. They provide context to metrics and allow "metric by group" data slicing.
+   #   - name: dimarea
+   #     type: categorical
+   #     expr: area_code
+    dimensions: # dimensions are qualitative values such as names, dates, or geographical data. They provide context to metrics and allow "metric by group" data slicing.
+      - name: spine
+        type: time
+        type_params:
+          time_granularity: day
+
+    measures: # Measures are columns we perform an aggregation over. Measures are inputs to metrics.
+      - name: graduate_count
+        description: "The total count of graduates."
+        agg: sum
+
+  - name: area# Another semantic model called customers.
+    model: ref('dimareascd')
+    description: "An area dimension table."
+
+    entities:
+      - name: area
+        type: primary
+        expr: area_code
+
+    dimensions:
+      - name: area_name
+        type: categorical 

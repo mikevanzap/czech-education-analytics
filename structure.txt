@@ -1,0 +1,34 @@
+czech-education-analytics/
+├── data/
+│   ├── institutions/               ← (you’ll put real Dataset 1 in SQL Server)
+│   └── graduates.csv               ← (sample provided; you’ll replace)
+├── docker/
+│   ├── docker-compose.yml          ← Hive Metastore + MinIO
+│   └── minio/
+│       └── graduates.csv           ← synced from ./data/
+├── trino/
+│   ├── etc/
+│   │   ├── config.properties
+│   │   ├── node.properties
+│   │   └── catalog/
+│   │       ├── hive.properties     ← points to MinIO + Hive Metastore
+│   │       └── sqlserver.properties ← points to your local SQL Server
+│   └── README.md                   ← how to start Trino
+├── dbt_project/
+│   ├── models/
+│   │   ├── staging/
+│   │   │   ├── stg_institutions.sql
+│   │   │   └── stg_graduates.sql
+│   │   └── marts/
+│   │       └── fct_regional_education.sql  ← ML-ready table
+│   ├── dbt_project.yml
+│   └── profiles.yml.example        ← you rename to profiles.yml
+├── ml/
+│   ├── analyze.py                  ← correlation, clustering
+│   └── requirements.txt
+├── streamlit_app/
+│   ├── app.py
+│   └── requirements.txt
+├── powerbi/                        ← optional: sample .pbix or connection guide
+├── README.md                       ← full setup guide
+└── .gitignore

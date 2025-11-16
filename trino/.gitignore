@@ -1,0 +1,6 @@
+plugin
+lib
+bin
+secrets-plugin
+!etc/*
+!.gitignore

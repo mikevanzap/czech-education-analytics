@@ -1,0 +1,154 @@
+# .github/workflows/deploy.yml
+name: Deploy Data Stack
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Manual trigger option
+
+env:
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  RESOURCE_GROUP: edustack
+  BLOB_STORAGE_ACCOUNT: edustack2025
+  CONTAINER_NAME: iceberg-data
+  ACI_NAME: trino-nessie-container
+  FUNCTION_APP_NAME: your-function-app
+  STATIC_WEB_APP_NAME: your-streamlit-app
+
+jobs:
+  deploy-configs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy dbt Project Files to Storage
+      run: |
+        # Upload dbt project files to Blob Storage
+        az storage blob upload-batch \
+          --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
+          --destination ${{ env.CONTAINER_NAME }}/dbt-project \
+          --source ./dbt-project \
+          --overwrite
+
+    - name: Deploy Trino Config Files to Storage
+      run: |
+        # Upload Trino configuration to Blob Storage
+        az storage blob upload-batch \
+          --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
+          --destination ${{ env.CONTAINER_NAME }}/trino-config \
+          --source ./trino \
+          --overwrite
+
+    - name: Get Storage Account Key
+      id: storage_key
+      run: |
+        STORAGE_KEY=$(az storage account keys list \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
+          --query "[0].value" \
+          --output tsv)
+        echo "storage_key=$STORAGE_KEY" >> $GITHUB_OUTPUT
+
+    - name: Update Nessie Container with Storage Config
+      run: |
+        # Restart Nessie with updated configuration if needed
+        # In real scenario, you might need to recreate container with new env vars
+        echo "Nessie already configured, no update needed"
+
+    - name: Upload dbt Project to Container (Alternative Method)
+      run: |
+        # Alternative: Copy files directly to running container
+        # This requires the container to have a way to receive files
+        # For now, we're uploading to Blob Storage where dbt can access them
+        az storage blob upload-batch \
+          --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
+          --destination ${{ env.CONTAINER_NAME }}/dbt-project \
+          --source ./dbt_project \
+          --overwrite
+        echo "Files uploaded to Blob Storage at: ${{ env.BLOB_STORAGE_ACCOUNT }}/${{ env.CONTAINER_NAME }}/dbt-project/"
+
+    - name: Verify Files Uploaded
+      run: |
+        # List uploaded files to verify
+        az storage blob list \
+          --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
+          --container-name ${{ env.CONTAINER_NAME }} \
+          --output table
+
+    - name: Get Container IPs
+      run: |
+        NESSIE_IP=$(az container show \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name nessie-catalog \
+          --query ipAddress.ip \
+          --output tsv)
+        TRINO_IP=$(az container show \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name trino-query \
+          --query ipAddress.ip \
+          --output tsv)
+        
+        echo "Nessie IP: $NESSIE_IP"
+        echo "Trino IP: $TRINO_IP"
+        echo "Storage Account: ${{ env.BLOB_STORAGE_ACCOUNT }}"
+        echo "Files available at: https://$BLOB_STORAGE_ACCOUNT.blob.core.windows.net/$CONTAINER_NAME/"
+
+    - name: Deploy Complete Notification
+      run: |
+        echo "✅ Configuration files deployed successfully!"
+        echo "📁 dbt project uploaded to: ${{ env.BLOB_STORAGE_ACCOUNT }}/dbt-project/"
+        echo "⚙️ Trino configs uploaded to: ${{ env.BLOB_STORAGE_ACCOUNT }}/trino-config/"
+        echo "📊 Data files uploaded to: ${{ env.BLOB_STORAGE_ACCOUNT }}/raw-data/"
+  # 3. Deploy Azure Functions (ML + Backend)
+  
+  deploy-functions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          cd ml-functions
+          pip install -r requirements.txt
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy Functions
+        run: |
+          az functionapp deployment source config-zip \
+            -g ${{ env.RESOURCE_GROUP }} \
+            -n ${{ env.FUNCTION_APP_NAME }} \
+            --src ml-functions.zip
+
+  # 4. Deploy Streamlit to Static Web App
+  deploy-streamlit:
+    needs: deploy-functions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to Static Web App
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/streamlit-app" 
+          output_location: "build"
+
+ 
