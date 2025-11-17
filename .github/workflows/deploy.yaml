@@ -108,7 +108,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          cd ml-functions
+          cd ml
           pip install -r requirements.txt
       
       - name: Azure Login
