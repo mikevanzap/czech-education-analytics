@@ -34,7 +34,7 @@ jobs:
         az storage blob upload-batch \
           --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
           --destination ${{ env.CONTAINER_NAME }}/dbt-project \
-          --source ./dbt-project \
+          --source ./dbt_project \
           --overwrite
 
     - name: Deploy Trino Config Files to Storage
@@ -61,18 +61,6 @@ jobs:
         # Restart Nessie with updated configuration if needed
         # In real scenario, you might need to recreate container with new env vars
         echo "Nessie already configured, no update needed"
-
-    - name: Upload dbt Project to Container (Alternative Method)
-      run: |
-        # Alternative: Copy files directly to running container
-        # This requires the container to have a way to receive files
-        # For now, we're uploading to Blob Storage where dbt can access them
-        az storage blob upload-batch \
-          --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
-          --destination ${{ env.CONTAINER_NAME }}/dbt-project \
-          --source ./dbt_project \
-          --overwrite
-        echo "Files uploaded to Blob Storage at: ${{ env.BLOB_STORAGE_ACCOUNT }}/${{ env.CONTAINER_NAME }}/dbt-project/"
 
     - name: Verify Files Uploaded
       run: |
