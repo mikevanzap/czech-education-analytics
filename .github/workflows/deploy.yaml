@@ -33,8 +33,15 @@ jobs:
         # Upload dbt project files to Blob Storage
         az storage blob upload-batch \
           --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
-          --destination ${{ env.CONTAINER_NAME }}/dbt-project \
+          --destination https://edustack2025.file.core.windows.net/dbtproject \
           --source ./dbt_project \
+          --overwrite
+    
+        # Upload dbt project files to Blob Storage
+        az storage blob upload-batch \
+          --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
+          --destination https://edustack2025.file.core.windows.net/dbtprofile \
+          --source ./dbt_profile \
           --overwrite
 
     - name: Deploy Trino Config Files to Storage
@@ -42,7 +49,7 @@ jobs:
         # Upload Trino configuration to Blob Storage
         az storage blob upload-batch \
           --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
-          --destination ${{ env.CONTAINER_NAME }}/trino-config \
+          --destination https://edustack2025.file.core.windows.net/icebergconfigdata \
           --source ./trino \
           --overwrite
 
