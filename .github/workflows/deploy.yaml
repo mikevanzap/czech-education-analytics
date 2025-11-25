@@ -51,7 +51,7 @@ jobs:
           --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
           --destination https://edustack2025.file.core.windows.net/icebergconfigdata \
           --source ./trino \
-          --access-key=${{ secrets.AZURE_STORAGE_KEY }}           
+          --account-key=${{ secrets.AZURE_STORAGE_KEY }}          
 
     - name: Get Storage Account Key
       id: storage_key
