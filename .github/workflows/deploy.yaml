@@ -35,25 +35,22 @@ jobs:
           --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
           --destination https://edustack2025.file.core.windows.net/dbtproject \
           --source ./dbt_project \
-          --overwrite 
           --account-key=${{ secrets.AZURE_STORAGE_KEY }} 
 
         az storage file upload-batch  \
           --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
           --destination https://edustack2025.file.core.windows.net/dbtprofile \
           --source ./dbt_profile \
-          --overwrite
           --account-key=${{ secrets.AZURE_STORAGE_KEY }} 
 
 
     - name: Deploy Trino Config Files to Storage
       run: |
         # Upload Trino configuration to Blob Storage
-        az storage blob upload-batch \
+        az storage file upload-batch \
           --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
           --destination https://edustack2025.file.core.windows.net/icebergconfigdata \
           --source ./trino \
-          --overwrite
           --access-key=${{ secrets.AZURE_STORAGE_KEY }}           
 
     - name: Get Storage Account Key
