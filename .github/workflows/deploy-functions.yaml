@@ -6,6 +6,7 @@ on:
     paths:
       - 'ml/**'
       - '.github/workflows/deploy-functions.yaml'
+      - 'host.json'
   workflow_dispatch:
 
 env:
