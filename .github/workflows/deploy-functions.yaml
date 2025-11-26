@@ -2,7 +2,7 @@ name: Deploy ML Model to Existing Azure Functions
  
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main]
     paths:
       - 'ml/**'
       - '.github/workflows/deploy-functions.yaml'
