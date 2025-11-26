@@ -12,7 +12,7 @@ env:
   BLOB_STORAGE_ACCOUNT: edustack2025
   CONTAINER_NAME: iceberg-data
   ACI_NAME: trino-nessie-container
-  FUNCTION_APP_NAME: your-function-app
+  FUNCTION_APP_NAME: czech-edu-api
   STATIC_WEB_APP_NAME: your-streamlit-app
 
 jobs:
@@ -69,14 +69,6 @@ jobs:
         # In real scenario, you might need to recreate container with new env vars
         echo "Nessie already configured, no update needed"
 
-    - name: Verify Files Uploaded
-      run: |
-        # List uploaded files to verify
-        az storage blob list \
-          --account-name ${{ env.BLOB_STORAGE_ACCOUNT }} \
-          --container-name ${{ env.CONTAINER_NAME }} \
-          --output table
-
     - name: Get Container IPs
       run: |
         NESSIE_IP=$(az container show \
@@ -90,11 +82,7 @@ jobs:
           --query ipAddress.ip \
           --output tsv)
         
-        echo "Nessie IP: $NESSIE_IP"
-        echo "Trino IP: $TRINO_IP"
-        echo "Storage Account: ${{ env.BLOB_STORAGE_ACCOUNT }}"
-        echo "Files available at: https://$BLOB_STORAGE_ACCOUNT.blob.core.windows.net/$CONTAINER_NAME/"
-
+ 
     - name: Deploy Complete Notification
       run: |
         echo "✅ Configuration files deployed successfully!"
@@ -103,47 +91,22 @@ jobs:
         echo "📊 Data files uploaded to: ${{ env.BLOB_STORAGE_ACCOUNT }}/raw-data/"
   # 3. Deploy Azure Functions (ML + Backend)
   
-  deploy-functions:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      
-      - name: Install dependencies
-        run: |
-          cd ml
-          pip install -r requirements.txt
-      
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-      - name: Deploy Functions
-        run: |
-          az functionapp deployment source config-zip \
-            -g ${{ env.RESOURCE_GROUP }} \
-            -n ${{ env.FUNCTION_APP_NAME }} \
-            --src ml-functions.zip
+  
 
   # 4. Deploy Streamlit to Static Web App
-  deploy-streamlit:
-    needs: deploy-functions
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Deploy to Static Web App
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          app_location: "/streamlit-app" 
-          output_location: "build"
+  #deploy-streamlit:
+  #  needs: deploy-functions
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - uses: actions/checkout@v3
+  #    
+  #    - name: Deploy to Static Web App
+  #      uses: Azure/static-web-apps-deploy@v1
+  #      with:
+  #        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+  #        repo_token: ${{ secrets.GITHUB_TOKEN }}
+  #        action: "upload"
+  #        app_location: "/streamlit-app" 
+  #        output_location: "build"
 
  
