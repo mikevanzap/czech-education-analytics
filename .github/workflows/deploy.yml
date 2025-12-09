@@ -9,6 +9,7 @@ env:
   AZURE_CONTAINER_INSTANCE_NAME: edustackcontainer
   IMAGE_NAME: ghcr.io/${{ github.repository }}
 
+  
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
