@@ -53,7 +53,12 @@ jobs:
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --name ${{ env.AZURE_CONTAINER_INSTANCE_NAME }} \
             --image $IMAGE_NAME:${{ github.sha }} \
-            --ports 80 \
+            --ports 8080 19120 \
+            --environment-variables \
+              AZURE_STORAGE_ACCOUNT=${{ secrets.AZURE_STORAGE_ACCOUNT }} \
+              KEEP_ALIVE="true" \
+             --secure-environment-variables \
+              AZURE_STORAGE_ACCESS_KEY=${{ secrets.AZURE_STORAGE_ACCESS_KEY }} \
             --restart-policy OnFailure \
             --os-type Linux \
             --query provisioningState \
