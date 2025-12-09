@@ -9,7 +9,7 @@ env:
   AZURE_CONTAINER_INSTANCE_NAME: edustackcontainer
   IMAGE_NAME: ghcr.io/${{ github.repository }}
 
-  
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -56,4 +56,6 @@ jobs:
             --ports 80 \
             --restart-policy OnFailure \
             --os-type Linux \
-            --query provisioningState
+            --query provisioningState \
+            --memory 1.5 \
+            --cpu 1
