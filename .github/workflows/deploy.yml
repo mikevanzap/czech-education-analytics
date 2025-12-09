@@ -1,0 +1,55 @@
+name: Build, Push, and Deploy to Azure Container Instances
+
+on:
+  push:
+    branches: [ main ]  # or your default branch
+
+env:
+  AZURE_RESOURCE_GROUP: my-rg
+  AZURE_CONTAINER_INSTANCE_NAME: my-reporting-app
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ----------------------------------------
+      # 1. Build and push image to GHCR
+      # ----------------------------------------
+      - name: Log in to GitHub Container Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          docker push $IMAGE_NAME:$IMAGE_TAG
+
+          # Optional: push 'latest'
+          docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:latest
+
+      # ----------------------------------------
+      # 2. Deploy to Azure Container Instances
+      # ----------------------------------------
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to ACI
+        run: |
+          # Use public GHCR image → no registry credentials needed
+          az container create \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_CONTAINER_INSTANCE_NAME }} \
+            --image $IMAGE_NAME:${{ github.sha }} \
+            --ports 80 \
+            --restart-policy OnFailure \
+            --os-type Linux \
+            --query provisioningState
