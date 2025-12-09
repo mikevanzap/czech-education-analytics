@@ -12,6 +12,9 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write    # ← THIS IS REQUIRED
+      contents: read
 
     steps:
       - name: Checkout code
