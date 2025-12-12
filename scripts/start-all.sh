@@ -1,10 +1,15 @@
 #!/bin/bash
 set -e
 
+
+envsubst < /opt/trino/etc/catalog/iceberg.properties.template > /opt/trino/etc/catalog/iceberg.properties
+
 echo "🚀 Starting Unified Analytics Stack"
 echo "   - Nessie (Catalog)"
 echo "   - Trino (Query Engine)"  
 echo "   - dbt (Transformations)"
+
+
 
 # Validate required environment variables
 if [ -z "$AZURE_STORAGE_ACCOUNT" ] || [ -z "$AZURE_STORAGE_ACCESS_KEY" ]; then

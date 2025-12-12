@@ -1,0 +1,12 @@
+# trino-catalogs/iceberg.properties
+#http://localhost:19120/api/v1
+connector.name=iceberg
+iceberg.catalog.type=nessie
+iceberg.register-table-procedure.enabled=true
+iceberg.unique-table-location=true
+iceberg.nessie-catalog.uri=http://localhost:19120/api/v2
+iceberg.nessie-catalog.ref=main
+iceberg.nessie-catalog.default-warehouse-dir=abfss://iceberg@edustack2025.dfs.core.windows.net
+fs.native-azure.enabled=true
+azure.auth-type=ACCESS_KEY
+azure.access-key=$AZURE_STORAGE_ACCESS_KEY
