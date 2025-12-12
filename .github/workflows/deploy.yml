@@ -39,6 +39,7 @@ jobs:
           docker push $IMAGE_NAME:latest
           
 
+
       # ----------------------------------------
       # 2. Deploy to Azure Container Instances
       # ----------------------------------------
