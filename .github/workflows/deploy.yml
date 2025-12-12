@@ -64,5 +64,6 @@ jobs:
             --restart-policy Never \
             --os-type Linux \
             --query provisioningState \
+            --dns-name-label czech-education-analytics82 \
             --memory 1.5 \
             --cpu 1
