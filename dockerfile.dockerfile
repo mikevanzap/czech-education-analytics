@@ -16,6 +16,8 @@ RUN apt-get update && \
 RUN python3 -m venv /opt/test-venv
 ENV PATH="/opt/test-venv/bin:$PATH"
 
+RUN apt-get update && apt-get install -y gettext && rm -rf /var/lib/apt/lists/*
+
 RUN pip install dbt-core==1.10.13 dbt-trino==1.9.3
 
 
