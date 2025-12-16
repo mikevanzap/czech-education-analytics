@@ -47,25 +47,7 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          script: |
-                      # === 1. Ensure Azure File Share is mounted ===
-                      MOUNT_POINT="/mnt/nessie-catalog"
-                      STORAGE_ACCOUNT="${{ secrets.AZURE_STORAGE_ACCOUNT }}"
-                      SHARE_NAME="nessiedata"
-                      STORAGE_KEY="${{ secrets.AZURE_STORAGE_ACCESS_KEY  }}"
 
-                      sudo mkdir -p "$MOUNT_POINT"
-
-                      # Check if already mounted
-                      if ! mountpoint -q "$MOUNT_POINT"; then
-                        echo "Mounting Azure File Share..."
-                        sudo mount -t cifs \
-                          "//${STORAGE_ACCOUNT}.file.core.windows.net/${SHARE_NAME}" \
-                          "$MOUNT_POINT" \
-                          -o "vers=3.0,username=${STORAGE_ACCOUNT},password=${STORAGE_KEY},dir_mode=0777,file_mode=0777,uid=1000,gid=1000"
-                      else
-                        echo "Azure File Share already mounted."
-                      fi
                       
       - name: Deploy to ACI
         run: |
@@ -75,6 +57,10 @@ jobs:
             --name ${{ env.AZURE_CONTAINER_INSTANCE_NAME }} \
             --image $IMAGE_NAME:${{ github.sha }} \
             --ports 8080 19120 \
+            --azure-file-volume-account-name $STORAGE_ACCOUNT \
+            --azure-file-volume-account-key  secrets.AZURE_STORAGE_ACCESS_KEY  \
+            --azure-file-volume-share-name nessiedata \
+            --azure-file-volume-mount-path /nessie-h2-data \
             --environment-variables \
               AZURE_STORAGE_ACCOUNT=${{ secrets.AZURE_STORAGE_ACCOUNT }} \
               KEEP_ALIVE="true" \
