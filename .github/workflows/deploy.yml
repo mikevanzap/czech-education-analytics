@@ -57,8 +57,8 @@ jobs:
             --name ${{ env.AZURE_CONTAINER_INSTANCE_NAME }} \
             --image $IMAGE_NAME:${{ github.sha }} \
             --ports 8080 19120 \
-            --azure-file-volume-account-name $STORAGE_ACCOUNT \
-            --azure-file-volume-account-key  secrets.AZURE_STORAGE_ACCESS_KEY  \
+            --azure-file-volume-account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }}\
+            --azure-file-volume-account-key ${{ secrets.AZURE_STORAGE_ACCESS_KEY }} \
             --azure-file-volume-share-name nessiedata \
             --azure-file-volume-mount-path /nessie-h2-data \
             --environment-variables \
