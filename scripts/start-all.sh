@@ -21,7 +21,7 @@ echo "✅ Azure Storage Account: $AZURE_STORAGE_ACCOUNT"
 
 # Start Nessie in background
 echo "🔄 Starting Nessie..."
-java -jar /opt/nessie.jar &
+java -cp "/opt/nessie.jar:/opt/h2-2.2.224.jar" io.quarkus.runner.GeneratedMain & 
 NESSIE_PID=$!
 
 # Wait for Nessie to start

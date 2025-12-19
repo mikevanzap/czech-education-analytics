@@ -33,6 +33,9 @@ RUN cd /opt && \
     mv nessie-quarkus-0.105.7-runner.jar nessie.jar
 
 # Create app directory
+
+RUN cd /opt && \
+    wget https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
  
 
  
