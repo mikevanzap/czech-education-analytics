@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:22-jre
 
 # Install Python and system dependencies
 RUN apt-get update && \
