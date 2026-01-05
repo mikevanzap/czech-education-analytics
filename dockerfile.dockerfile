@@ -22,10 +22,10 @@ RUN pip install dbt-core==1.10.13 dbt-trino==1.9.3
 
 
 RUN cd /opt && \
-    wget https://repo1.maven.org/maven2/io/trino/trino-server/476/trino-server-476.tar.gz && \
-    tar -xzf trino-server-476.tar.gz && \
-    mv trino-server-476 trino && \
-    rm trino-server-476.tar.gz
+    wget https://repo1.maven.org/maven2/io/trino/trino-server/475/trino-server-475.tar.gz && \
+    tar -xzf trino-server-475.tar.gz && \
+    mv trino-server-475 trino && \
+    rm trino-server-475.tar.gz
 
 # Download and install Nessie
 RUN cd /opt && \
