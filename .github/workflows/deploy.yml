@@ -64,11 +64,15 @@ jobs:
             --environment-variables \
               AZURE_STORAGE_ACCOUNT=${{ secrets.AZURE_STORAGE_ACCOUNT }} \
               KEEP_ALIVE="true" \
-              QUARKUS_DATASOURCE_DB_KIND=h2 \
-              "QUARKUS_DATASOURCE_JDBC_URL=jdbc:h2:file:/nessie-h2-data/nessie;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE" \
-              NESSIE_AUTH_ENABLED=false \
-              NESSIE_VERSION_STORE_TYPE=JDBC \
-             --secure-environment-variables \
+              QUARKUS_DATASOURCE_H2_DB_KIND=h2=h2 \
+              QUARKUS_DATASOURCE_H2_JDBC_URL="jdbc:h2:file:/nessie-h2-data/nessie;MODE=PostgreSQL;DB_CLOSE_ON_EXIT=FALSE;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH" \
+              QUARKUS_DATASOURCE_H2_USERNAME=sa \
+              QUARKUS_DATASOURCE_H2_PASSWORD=  \
+              NESSIE_VERSION_STORE_PERSIST_JDBC_DATASOURCE=h2  \
+              NESSIE_AUTH_ENABLED=false  \
+              NESSIE_VERSION_STORE_JDBC_NEW_AUTODETECT=false \
+              NESSIE_VERSION_STORE_TYPE=JDBC \  
+            --secure-environment-variables \
               AZURE_STORAGE_ACCESS_KEY=${{ secrets.AZURE_STORAGE_ACCESS_KEY }} \
             --restart-policy Never \
             --os-type Linux \
