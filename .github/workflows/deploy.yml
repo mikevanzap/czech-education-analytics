@@ -71,7 +71,7 @@ jobs:
               NESSIE_VERSION_STORE_PERSIST_JDBC_DATASOURCE=h2  \
               NESSIE_AUTH_ENABLED=false  \
               NESSIE_VERSION_STORE_JDBC_NEW_AUTODETECT=false \
-              NESSIE_VERSION_STORE_TYPE=JDBC \  
+              NESSIE_VERSION_STORE_TYPE=JDBC \
             --secure-environment-variables \
               AZURE_STORAGE_ACCESS_KEY=${{ secrets.AZURE_STORAGE_ACCESS_KEY }} \
             --restart-policy Never \
